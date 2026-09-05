@@ -10,8 +10,9 @@ import type {
   WeatherData,
 } from '@/types/weather';
 import { ApiError, safeFetchJson } from '@/lib/api';
-import { OPEN_METEO_AIR_BASE, OPEN_METEO_BASE } from '@/lib/config';
+import { config, OPEN_METEO_AIR_BASE, OPEN_METEO_BASE } from '@/lib/config';
 import { conditionFromCodes, conditionMeta } from '@/utils/weatherConditions';
+import { owFetchWeather } from '@/services/openWeatherApi';
 
 interface OMCurrent {
   time: string;
@@ -87,6 +88,10 @@ interface OMAirResponse {
 }
 
 export async function fetchWeather(location: GeoLocation): Promise<WeatherData> {
+  if (config.weatherApiProvider === 'openweather' && config.weatherApiKey) {
+    return owFetchWeather(location);
+  }
+
   const params = new URLSearchParams({
     latitude: location.latitude.toString(),
     longitude: location.longitude.toString(),

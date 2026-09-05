@@ -1,6 +1,7 @@
 import type { GeoLocation } from '@/types/weather';
 import { ApiError, safeFetchJson } from '@/lib/api';
-import { OPEN_METEO_GEO_BASE } from '@/lib/config';
+import { config, OPEN_METEO_GEO_BASE } from '@/lib/config';
+import { owSearchLocations, owReverseGeocode } from '@/services/openWeatherApi';
 
 interface OpenMeteoGeoResult {
   id: number;
@@ -21,6 +22,11 @@ interface OpenMeteoGeoResponse {
 export async function searchLocations(query: string, count = 8): Promise<GeoLocation[]> {
   const trimmed = query.trim();
   if (trimmed.length < 2) return [];
+
+  if (config.weatherApiProvider === 'openweather' && config.weatherApiKey) {
+    return owSearchLocations(trimmed, count);
+  }
+
   const url = `${OPEN_METEO_GEO_BASE}/search?name=${encodeURIComponent(
     trimmed
   )}&count=${count}&language=en&format=json`;
@@ -34,6 +40,10 @@ export async function searchLocations(query: string, count = 8): Promise<GeoLoca
 }
 
 export async function reverseGeocode(lat: number, lon: number): Promise<GeoLocation> {
+  if (config.weatherApiProvider === 'openweather' && config.weatherApiKey) {
+    return owReverseGeocode(lat, lon);
+  }
+
   const url = `${OPEN_METEO_GEO_BASE}/search?latitude=${lat.toFixed(
     4
   )}&longitude=${lon.toFixed(4)}&count=1&language=en&format=json`;

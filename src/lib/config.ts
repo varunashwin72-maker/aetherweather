@@ -13,3 +13,8 @@ export const config = {
 export const OPEN_METEO_BASE = 'https://api.open-meteo.com/v1';
 export const OPEN_METEO_GEO_BASE = 'https://geocoding-api.open-meteo.com/v1';
 export const OPEN_METEO_AIR_BASE = 'https://air-quality-api.open-meteo.com/v1';
+
+export const OPENWEATHER_BASE = 'https://api.openweathermap.org';
+export const OPENWEATHER_GEO_BASE = 'https://api.openweathermap.org/geo/1.0';
+export const OPENWEATHER_DATA_BASE = 'https://api.openweathermap.org/data/3.0';
+export const OPENWEATHER_DATA2_BASE = 'https://api.openweathermap.org/data/2.5';

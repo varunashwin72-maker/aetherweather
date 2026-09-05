@@ -43,6 +43,24 @@ export function conditionFromCodes(
   return isDay ? 'partly-cloudy' : 'partly-cloudy';
 }
 
+export function conditionFromOpenWeatherId(id: number, isDay = true): WeatherCondition {
+  if (id >= 200 && id < 300) return 'thunderstorm';
+  if (id >= 300 && id < 400) return 'drizzle';
+  if (id === 500) return 'drizzle';
+  if (id >= 501 && id <= 531) return 'rain';
+  if (id === 511) return 'freezing-rain';
+  if (id >= 600 && id < 700) return 'snow';
+  if (id >= 700 && id < 800) {
+    if (id === 701 || id === 711 || id === 721 || id === 741) return 'fog';
+    return 'fog';
+  }
+  if (id === 800) return 'clear';
+  if (id === 801 || id === 802) return 'partly-cloudy';
+  if (id === 803) return 'cloudy';
+  if (id === 804) return 'overcast';
+  return isDay ? 'partly-cloudy' : 'partly-cloudy';
+}
+
 export function weatherIconKey(c: WeatherCondition, isDay = true): string {
   switch (c) {
     case 'clear':
