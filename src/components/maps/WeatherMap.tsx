@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import type { GeoLocation } from '@/types/weather';
 import { cn } from '@/utils/cn';
 import { owReverseGeocode } from '@/services/openWeatherApi';
+import { config } from '@/lib/config';
 
 type Layer = 'radar' | 'temperature' | 'precipitation' | 'wind' | 'cloud';
 
@@ -16,7 +17,7 @@ const LAYERS: { id: Layer; label: string; icon: typeof CloudRain }[] = [
   { id: 'cloud', label: 'Clouds', icon: CloudRain },
 ];
 
-const OW_KEY = import.meta.env.VITE_WEATHER_API_KEY as string;
+const OW_KEY = config.weatherApiKey;
 
 const OW_TILE_LAYERS: Record<Layer, string> = {
   radar: 'https://tile.openweathermap.org/map/precipitation/{z}/{x}/{y}.png',
@@ -55,10 +56,10 @@ export function WeatherMap({ location, onSelectLocation }: Props) {
       worldCopyJump: true,
     });
 
-    // Dark-themed base map for a more realistic weather radar look
-    const baseLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Bright OpenStreetMap base keeps geographic details readable beneath the weather overlay.
+    const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
+      attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);
 
     L.control.attribution({ position: 'bottomright', prefix: false }).addTo(map);
@@ -153,7 +154,7 @@ export function WeatherMap({ location, onSelectLocation }: Props) {
     if (OW_KEY) {
       const weatherLayer = L.tileLayer(`${OW_TILE_LAYERS[layer]}?appid=${OW_KEY}`, {
         maxZoom: 19,
-        opacity: 0.65,
+        opacity: layer === 'radar' ? 0.72 : 0.58,
         zIndex: 400,
       });
       weatherLayer.addTo(map);
