@@ -4,6 +4,7 @@ import { SettingsProvider, useSettings } from '@/hooks/useSettings';
 import { useWeather } from '@/hooks/useWeather';
 import { useGeolocation } from '@/hooks/useLocation';
 import { useFavorites } from '@/hooks/useFavorites';
+import { MapPin } from 'lucide-react';
 import { Navbar, type NavId } from '@/components/navigation/Navbar';
 import { MobileNav } from '@/components/navigation/MobileNav';
 import { SearchBar } from '@/components/navigation/SearchBar';
@@ -111,6 +112,15 @@ function AppInner() {
         />
 
         <main className="mx-auto max-w-7xl px-4 pb-24 pt-20 sm:px-6 lg:pb-12">
+          {/* Selected location banner */}
+          <div className="mb-6 flex items-center gap-2 text-sm text-white/80">
+            <MapPin className="h-4 w-4 shrink-0 text-aether-300" />
+            <span className="text-white/60">Selected location:</span>
+            <span className="font-semibold text-white">{location.name}</span>
+            {location.region && <span className="text-white/50">· {location.region}</span>}
+            {location.country && <span className="text-white/50">· {location.country}</span>}
+          </div>
+
           {/* Mobile search */}
           <div className="mb-6 sm:hidden">
             <SearchBar
