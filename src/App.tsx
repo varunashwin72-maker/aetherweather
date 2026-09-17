@@ -144,8 +144,8 @@ function AppInner() {
                 <Home data={data} settings={settings} loading={loading} lastUpdated={lastUpdated} onRefresh={refresh} />
               )}
               {active === 'forecast' && <Forecast data={data} settings={settings} />}
-              {active === 'radar' && <Radar data={data} />}
-              {active === 'maps' && <Maps data={data} />}
+              {active === 'radar' && <Radar data={data} onSelectLocation={handleSelect} />}
+              {active === 'maps' && <Maps data={data} onSelectLocation={handleSelect} />}
               {active === 'air' && <Air data={data} />}
               {active === 'alerts' && <Alerts data={data} />}
               {active === 'favorites' && (

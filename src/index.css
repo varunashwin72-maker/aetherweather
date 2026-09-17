@@ -80,6 +80,26 @@ input[type='number']::-webkit-inner-spin-button {
   border-radius: 6px;
 }
 
+@keyframes pulse-marker {
+  0%, 100% { box-shadow: 0 0 0 6px rgba(56,189,248,.25), 0 2px 12px rgba(0,0,0,.5); }
+  50% { box-shadow: 0 0 0 12px rgba(56,189,248,.1), 0 2px 12px rgba(0,0,0,.5); }
+}
+
+.leaflet-container {
+  background: #0a0f1a !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(5,11,24,.7) !important;
+  color: rgba(255,255,255,.5) !important;
+  font-size: 10px !important;
+  border-radius: 4px 0 0 0;
+}
+
+.leaflet-control-attribution a {
+  color: rgba(127,191,251,.7) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
