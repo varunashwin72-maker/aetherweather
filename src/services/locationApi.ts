@@ -52,7 +52,7 @@ export async function reverseGeocode(lat: number, lon: number): Promise<GeoLocat
   if (hit) return mapGeo(hit);
   return {
     id: `geo-${lat.toFixed(2)}-${lon.toFixed(2)}`,
-    name: 'Current Location',
+    name: `${lat.toFixed(2)}, ${lon.toFixed(2)}`,
     latitude: lat,
     longitude: lon,
   };

@@ -461,7 +461,7 @@ export async function owReverseGeocode(lat: number, lon: number): Promise<GeoLoc
   if (!API_KEY) {
     return {
       id: `geo-${lat.toFixed(2)}-${lon.toFixed(2)}`,
-      name: 'Current Location',
+      name: `${lat.toFixed(2)}, ${lon.toFixed(2)}`,
       latitude: lat,
       longitude: lon,
     };
@@ -489,7 +489,7 @@ export async function owReverseGeocode(lat: number, lon: number): Promise<GeoLoc
   }
   return {
     id: `geo-${lat.toFixed(2)}-${lon.toFixed(2)}`,
-    name: 'Current Location',
+    name: `${lat.toFixed(2)}, ${lon.toFixed(2)}`,
     latitude: lat,
     longitude: lon,
   };

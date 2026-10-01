@@ -4,7 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { GeoLocation } from '@/types/weather';
 import { cn } from '@/utils/cn';
-import { owReverseGeocode } from '@/services/openWeatherApi';
+import { reverseGeocode } from '@/services/locationApi';
 import { config } from '@/lib/config';
 
 type Layer = 'radar' | 'temperature' | 'precipitation' | 'wind' | 'cloud';
@@ -104,12 +104,12 @@ export function WeatherMap({ location, onSelectLocation }: Props) {
 
       setResolving(true);
       try {
-        const resolved = await owReverseGeocode(lat, lng);
+        const resolved = await reverseGeocode(lat, lng);
         setPendingLocation(resolved);
       } catch {
         setPendingLocation({
           id: `geo-${lat.toFixed(2)}-${lng.toFixed(2)}`,
-          name: 'Dropped Pin',
+          name: `${lat.toFixed(2)}, ${lng.toFixed(2)}`,
           latitude: lat,
           longitude: lng,
         });
