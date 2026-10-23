@@ -7,7 +7,10 @@ export const config = {
   weatherApiProvider: ((ENV.VITE_WEATHER_API_PROVIDER as string | undefined) ?? 'open-meteo') as
     | 'open-meteo'
     | 'openweather',
-  isWeatherConfigured: Boolean(ENV.VITE_WEATHER_API_KEY) || true,
+  // Open-Meteo is keyless; a keyed provider is only configured when a key is present.
+  isWeatherConfigured:
+    ((ENV.VITE_WEATHER_API_PROVIDER as string | undefined) ?? 'open-meteo') !== 'openweather' ||
+    Boolean(ENV.VITE_WEATHER_API_KEY),
 };
 
 export const OPEN_METEO_BASE = 'https://api.open-meteo.com/v1';

@@ -6,7 +6,6 @@ import type {
   GeoLocation,
   HourForecast,
   WeatherAlert,
-  WeatherCondition,
   WeatherData,
 } from '@/types/weather';
 import { ApiError, safeFetchJson } from '@/lib/api';

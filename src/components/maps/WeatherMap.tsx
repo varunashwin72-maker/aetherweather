@@ -57,7 +57,7 @@ export function WeatherMap({ location, onSelectLocation }: Props) {
     });
 
     // Bright OpenStreetMap base keeps geographic details readable beneath the weather overlay.
-    const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);

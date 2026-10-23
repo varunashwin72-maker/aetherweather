@@ -34,6 +34,15 @@ export async function safeFetchJson<T>(
       } catch {
         /* ignore */
       }
+      if (res.status === 401) {
+        throw new ApiError('no-key', detail || 'The weather API key is missing or invalid.', 401);
+      }
+      if (res.status === 403) {
+        throw new ApiError('permission', detail || 'Access to the weather service was denied.', 403);
+      }
+      if (res.status === 404) {
+        throw new ApiError('not-found', detail || 'The requested location was not found.', 404);
+      }
       throw new ApiError('api', detail || 'The weather service rejected the request.', res.status);
     }
     if (!res.ok) {

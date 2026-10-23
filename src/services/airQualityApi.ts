@@ -1,4 +1,3 @@
-import type { AirQuality } from '@/types/weather';
 import { aqiCategory } from '@/services/weatherApi';
 
 export interface AqiBand {

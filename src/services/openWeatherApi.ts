@@ -143,7 +143,8 @@ async function owFetchAirQuality(location: GeoLocation): Promise<AirQuality | nu
   if (!data.list?.[0]) return null;
   const a = data.list[0];
   return {
-    index: a.main.aqi,
+    // OpenWeather reports 1-5; the UI uses a 0-100 scale (20-point bands), so scale to match.
+    index: a.main.aqi * 20,
     category: owAqiCategory(a.main.aqi),
     pm25: a.components.pm2_5,
     pm10: a.components.pm10,
@@ -253,7 +254,8 @@ function normalizeHourly(items: OWForecastItem[]): HourForecast[] {
 function normalizeDaily(items: OWForecastItem[], city: OWForecastResponse['city']): DayForecast[] {
   const dayMap = new Map<string, OWForecastItem[]>();
   for (const item of items) {
-    const dateKey = item.dt_txt.slice(0, 10);
+    // Group by the city's local calendar date (dt_txt is UTC and would split local days).
+    const dateKey = new Date((item.dt + city.timezone) * 1000).toISOString().slice(0, 10);
     if (!dayMap.has(dateKey)) dayMap.set(dateKey, []);
     dayMap.get(dateKey)!.push(item);
   }
@@ -292,7 +294,6 @@ function normalizeDaily(items: OWForecastItem[], city: OWForecastResponse['city'
 
     const condition = conditionFromOpenWeatherId(dominantWeatherId, true);
     const date = parseDateString(dateKey, tzOffset);
-    const dayLength = city.sunset - city.sunrise;
 
     out.push({
       date,
@@ -438,7 +439,7 @@ export async function owSearchLocations(query: string, count = 8): Promise<GeoLo
   const trimmed = query.trim();
   if (trimmed.length < 2) return [];
   const url = buildUrl(OPENWEATHER_GEO_BASE, '/direct', {
-    q: encodeURIComponent(trimmed),
+    q: trimmed, // URLSearchParams already encodes; encoding here would double-encode
     limit: count.toString(),
   });
   try {

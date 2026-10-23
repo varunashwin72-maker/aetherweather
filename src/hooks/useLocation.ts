@@ -13,25 +13,26 @@ export function useGeolocation() {
     }
     setLocating(true);
     try {
-      const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: false,
-          timeout: 10000,
-          maximumAge: 300000,
+      let pos: GeolocationPosition;
+      try {
+        pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 300000,
+          });
         });
-      });
-      setPermission('granted');
-      const loc = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-      return loc;
-    } catch (e) {
-      setPermission('denied');
-      if (e instanceof GeolocationPositionError || (e as GeolocationPositionError)?.code) {
+      } catch {
+        // Only a failure to obtain the position means permission/location is unavailable.
+        setPermission('denied');
         throw new ApiError(
           'permission',
           'Location access was denied. Search for a city instead, or allow location access in your browser settings.'
         );
       }
-      throw e;
+      setPermission('granted');
+      // A reverse-geocoding failure is a network/API problem, not a permission problem.
+      return await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
     } finally {
       setLocating(false);
     }

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import type { CurrentWeather } from '@/types/weather';
 import type { Settings } from '@/utils/formatters';
 import { convertWind, windUnitLabel } from '@/utils/formatters';
-import { cn } from '@/utils/cn';
 
 interface Props {
   current: CurrentWeather;

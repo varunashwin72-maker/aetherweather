@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Sunrise, Sunset, Sun, Moon } from 'lucide-react';
+import { Sunrise, Sunset, Sun } from 'lucide-react';
 import type { AstronomyData } from '@/types/weather';
 import { moonPhaseName } from '@/services/weatherApi';
 
