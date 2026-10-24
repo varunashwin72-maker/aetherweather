@@ -39,6 +39,11 @@ so a bare checkout runs with **no `.env` at all**. Do not create one from `.env.
 sets `VITE_WEATHER_API_PROVIDER=openweather`, which switches to the keyed provider. Only add a
 `VITE_WEATHER_API_KEY` if someone actually wants OpenWeather, and never commit a real key.
 
+Keys are only needed for the map's temperature/wind/cloud overlays (OpenWeather tiles). The animated
+radar is keyless: it uses RainViewer's public frame index (`src/services/radarApi.ts`), whose free
+tile cache **stops at zoom 7** — the tile layers set `maxNativeZoom: 7` so deeper zooms are scaled
+from those tiles instead of returning the server's "Zoom Level Not Supported" placeholder.
+
 ## Verifying it works
 
 - `curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/` → 200, and

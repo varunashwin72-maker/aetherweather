@@ -18,19 +18,43 @@ export function WindCompass({ current, settings }: Props) {
   const cardinal = useMemo(() => COMPASS_POINTS[Math.round(dir / 22.5) % 16], [dir]);
 
   return (
-    <div className="glass-card flex flex-col items-center gap-4 px-6 py-6">
+    <div className={cn('glass-card flex flex-col items-center gap-4 px-6 py-6')}>
       <div className="relative grid h-44 w-44 place-items-center">
+        {/* Wind strength breathes behind the dial */}
+        <div
+          className="pointer-events-none absolute inset-5 animate-glow-pulse rounded-full bg-aether-500/20 blur-2xl"
+          aria-hidden
+        />
+
         <svg viewBox="0 0 120 120" className="h-44 w-44">
           <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
           <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-          {COMPASS_POINTS.map((_, i) => {
-            const angle = (i * 22.5 * Math.PI) / 180;
-            const x1 = 60 + Math.cos(angle) * 52;
-            const y1 = 60 + Math.sin(angle) * 52;
-            const x2 = 60 + Math.cos(angle) * (i % 2 === 0 ? 46 : 49);
-            const y2 = 60 + Math.sin(angle) * (i % 2 === 0 ? 46 : 49);
-            return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,255,255,0.25)" strokeWidth={i % 2 === 0 ? 1 : 0.5} />;
-          })}
+
+          {/* Index ring turns slowly, like a live instrument */}
+          <g className="animate-ring-spin" style={{ transformOrigin: '60px 60px' }}>
+            {COMPASS_POINTS.map((_, i) => {
+              const angle = (i * 22.5 * Math.PI) / 180;
+              const x1 = 60 + Math.cos(angle) * 52;
+              const y1 = 60 + Math.sin(angle) * 52;
+              const x2 = 60 + Math.cos(angle) * (i % 2 === 0 ? 46 : 49);
+              const y2 = 60 + Math.sin(angle) * (i % 2 === 0 ? 46 : 49);
+              return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(255,255,255,0.25)" strokeWidth={i % 2 === 0 ? 1 : 0.5} />;
+            })}
+          </g>
+
+          {/* Dashed ring drifting the other way */}
+          <circle
+            cx="60"
+            cy="60"
+            r="39"
+            fill="none"
+            stroke="rgba(127,191,251,0.3)"
+            strokeWidth="1"
+            strokeDasharray="3 7"
+            className="animate-ring-spin-reverse"
+            style={{ transformOrigin: '60px 60px' }}
+          />
+
           {['N', 'E', 'S', 'W'].map((p, i) => {
             const angle = (i * 90 - 90) * (Math.PI / 180);
             const x = 60 + Math.cos(angle) * 36;
@@ -41,17 +65,29 @@ export function WindCompass({ current, settings }: Props) {
               </text>
             );
           })}
-          <g transform={`rotate(${dir} 60 60)`} style={{ transition: 'transform 0.8s cubic-bezier(0.16,1,0.3,1)' }}>
+
+          {/* Needle eases to the new bearing instead of snapping */}
+          <g transform={`rotate(${dir} 60 60)`} style={{ transition: 'transform 1.1s cubic-bezier(0.16,1,0.3,1)' }}>
+            <circle
+              cx="60"
+              cy="20"
+              r="7"
+              fill="rgba(127,191,251,0.35)"
+              className="animate-glow-pulse"
+              style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+            />
             <path d="M60,16 L54,60 L60,54 L66,60 Z" fill="#7fc1f5" className="drop-shadow-[0_0_6px_rgba(127,191,251,0.7)]" />
             <path d="M60,104 L54,60 L60,66 L66,60 Z" fill="rgba(255,255,255,0.3)" />
             <circle cx="60" cy="60" r="4" fill="#fff" />
           </g>
         </svg>
+
         <div className="absolute flex flex-col items-center">
           <span className="font-display text-2xl font-semibold text-white">{speed}</span>
           <span className="text-[10px] uppercase tracking-wider text-white/45">{windUnitLabel(settings.windUnit)}</span>
         </div>
       </div>
+
       <div className="grid w-full grid-cols-2 gap-3">
         <div className="flex flex-col items-center">
           <span className="text-[10px] uppercase tracking-wider text-white/45">Direction</span>

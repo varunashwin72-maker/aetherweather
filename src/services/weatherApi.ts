@@ -157,6 +157,42 @@ export async function fetchWeather(location: GeoLocation): Promise<WeatherData> 
   return normalize(data, location, airQuality);
 }
 
+/**
+ * Current conditions for a single point (no forecast payload) — used for the
+ * lightweight preview shown when a spot is picked on the map.
+ */
+export async function fetchCurrentWeather(location: GeoLocation): Promise<CurrentWeather> {
+  if (config.weatherApiProvider === 'openweather' && config.weatherApiKey) {
+    const data = await owFetchWeather(location);
+    return data.current;
+  }
+
+  const params = new URLSearchParams({
+    latitude: location.latitude.toString(),
+    longitude: location.longitude.toString(),
+    current: [
+      'temperature_2m',
+      'apparent_temperature',
+      'relative_humidity_2m',
+      'dew_point_2m',
+      'weather_code',
+      'wind_speed_10m',
+      'wind_gusts_10m',
+      'wind_direction_10m',
+      'surface_pressure',
+      'cloud_cover',
+      'uv_index',
+      'precipitation',
+      'precipitation_probability',
+      'is_day',
+    ].join(','),
+    timezone: 'auto',
+  });
+
+  const data = await safeFetchJson<OMResponse>(`${OPEN_METEO_BASE}/forecast?${params.toString()}`);
+  return normalizeCurrent(data.current, data.utc_offset_seconds * 1000);
+}
+
 async function fetchAirQuality(location: GeoLocation): Promise<AirQuality | null> {
   const params = new URLSearchParams({
     latitude: location.latitude.toString(),

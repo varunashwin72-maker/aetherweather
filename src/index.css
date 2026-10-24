@@ -85,6 +85,79 @@ input[type='number']::-webkit-inner-spin-button {
   50% { box-shadow: 0 0 0 12px rgba(56,189,248,.1), 0 2px 12px rgba(0,0,0,.5); }
 }
 
+/* Radar frames cross-fade in as the loop advances. */
+.radar-tiles {
+  transition: opacity 0.45s ease;
+}
+
+/* Place-name pill pinned to the selected map location. */
+.leaflet-tooltip.map-label {
+  background: rgba(8, 18, 38, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 3px 10px;
+  color: #eaf3ff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+}
+.leaflet-tooltip.map-label::before {
+  display: none;
+}
+
+/* Radar timeline scrubber */
+.radar-scrubber {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(127, 191, 251, 0.85), rgba(127, 191, 251, 0.25));
+  outline: none;
+}
+.radar-scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 13px;
+  width: 13px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #3a9bf8;
+  box-shadow: 0 0 10px rgba(58, 155, 248, 0.8);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.radar-scrubber::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+}
+.radar-scrubber::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #3a9bf8;
+  cursor: pointer;
+}
+
+/* A short light pulse that travels along the sun's arc. */
+@keyframes arcComet {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -260; }
+}
+.arc-comet {
+  animation: arcComet 7s linear infinite;
+}
+
+/* Card surfaces ease into hover instead of snapping. */
+.glass-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease,
+    background-color 0.4s ease, border-color 0.4s ease;
+}
+.glass-card:hover {
+  box-shadow: 0 14px 40px rgba(2, 12, 30, 0.34);
+}
+
 .leaflet-container {
   background: #0a0f1a !important;
 }

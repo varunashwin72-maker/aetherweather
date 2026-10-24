@@ -16,32 +16,53 @@ interface Props {
   onRefresh: () => void;
 }
 
+/** Panels ease in one after another instead of appearing all at once. */
+function stagger(index: number): React.CSSProperties {
+  return { animationDelay: `${index * 70}ms`, animationFillMode: 'both' };
+}
+
 export function Home({ data, settings, loading, lastUpdated, onRefresh }: Props) {
   return (
     <div className="flex flex-col gap-8">
-      <HeroWeather
-        data={data}
-        settings={settings}
-        loading={loading}
-        lastUpdated={lastUpdated}
-        onRefresh={onRefresh}
-        isFavorite={false}
-        onToggleFavorite={() => {}}
-      />
+      <div className="animate-fade-up" style={stagger(0)}>
+        <HeroWeather
+          data={data}
+          settings={settings}
+          loading={loading}
+          lastUpdated={lastUpdated}
+          onRefresh={onRefresh}
+          isFavorite={false}
+          onToggleFavorite={() => {}}
+        />
+      </div>
 
-      <HourlyForecast hours={data.hourly} settings={settings} />
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <InsightsPanel data={data} />
-        <PrecipitationTimeline hourly={data.hourly} />
+      <div className="animate-fade-up" style={stagger(1)}>
+        <HourlyForecast hours={data.hourly} settings={settings} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <WindCompass current={data.current} settings={settings} />
-        <SunMoonPanel astronomy={data.astronomy} />
+        <div className="animate-fade-up" style={stagger(2)}>
+          <InsightsPanel data={data} />
+        </div>
+        <div className="animate-fade-up" style={stagger(3)}>
+          <PrecipitationTimeline hourly={data.hourly} />
+        </div>
       </div>
 
-      {data.alerts.length > 0 && <AlertsPanel alerts={data.alerts} />}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="animate-fade-up" style={stagger(4)}>
+          <WindCompass current={data.current} settings={settings} />
+        </div>
+        <div className="animate-fade-up" style={stagger(5)}>
+          <SunMoonPanel astronomy={data.astronomy} />
+        </div>
+      </div>
+
+      {data.alerts.length > 0 && (
+        <div className="animate-fade-up" style={stagger(6)}>
+          <AlertsPanel alerts={data.alerts} />
+        </div>
+      )}
     </div>
   );
 }

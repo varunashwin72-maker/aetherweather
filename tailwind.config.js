@@ -58,6 +58,13 @@ export default {
         float: 'float 8s ease-in-out infinite',
         shimmer: 'shimmer 1.8s linear infinite',
         aurora: 'aurora 16s ease-in-out infinite alternate',
+        'float-slow': 'float 6s ease-in-out infinite',
+        'glow-pulse': 'glowPulse 4s ease-in-out infinite',
+        'radar-pulse': 'radarPulse 2s ease-in-out infinite',
+        'ring-spin': 'spin 48s linear infinite',
+        'ring-spin-reverse': 'spinReverse 64s linear infinite',
+        twinkle: 'twinkle 3.5s ease-in-out infinite',
+        'moon-glow': 'moonGlow 6s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
@@ -85,6 +92,26 @@ export default {
           '0%': { transform: 'translate(-10%, -5%) rotate(0deg) scale(1)' },
           '50%': { transform: 'translate(10%, 5%) rotate(8deg) scale(1.15)' },
           '100%': { transform: 'translate(-5%, 8%) rotate(-6deg) scale(1.05)' },
+        },
+        spinReverse: {
+          '0%': { transform: 'rotate(360deg)' },
+          '100%': { transform: 'rotate(0deg)' },
+        },
+        glowPulse: {
+          '0%,100%': { opacity: '0.5', transform: 'scale(0.96)' },
+          '50%': { opacity: '0.95', transform: 'scale(1.06)' },
+        },
+        radarPulse: {
+          '0%,100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.4', transform: 'scale(0.7)' },
+        },
+        twinkle: {
+          '0%,100%': { opacity: '0.25' },
+          '50%': { opacity: '0.9' },
+        },
+        moonGlow: {
+          '0%,100%': { opacity: '0.35' },
+          '50%': { opacity: '0.7' },
         },
       },
     },

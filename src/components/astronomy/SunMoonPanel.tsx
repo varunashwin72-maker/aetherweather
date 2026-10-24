@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Sunrise, Sunset, Sun, Moon } from 'lucide-react';
+import { Sunrise, Sunset, Sun } from 'lucide-react';
 import type { AstronomyData } from '@/types/weather';
 import { moonPhaseName } from '@/services/weatherApi';
 
@@ -18,6 +18,11 @@ export function SunMoonPanel({ astronomy }: Props) {
   const hours = Math.floor(astronomy.dayLength / 3600000);
   const minutes = Math.round((astronomy.dayLength % 3600000) / 60000);
 
+  // Ride the drawn arc (quadratic bezier M10,70 Q100,-10 190,70) so the sun stays
+  // on the curve all day — the old straight-line sine put it off-canvas at noon.
+  const sunX = bezierAt(10, 100, 190, dayProgress);
+  const sunY = bezierAt(70, -10, 70, dayProgress);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between px-1">
@@ -33,7 +38,12 @@ export function SunMoonPanel({ astronomy }: Props) {
                 <stop offset="50%" stopColor="rgba(255,212,122,0.6)" />
                 <stop offset="100%" stopColor="rgba(127,191,251,0.2)" />
               </linearGradient>
+              <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="rgba(255,212,122,0.75)" />
+                <stop offset="100%" stopColor="rgba(255,212,122,0)" />
+              </radialGradient>
             </defs>
+
             <path d="M10,70 Q100,-10 190,70" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
             <path
               d="M10,70 Q100,-10 190,70"
@@ -41,14 +51,46 @@ export function SunMoonPanel({ astronomy }: Props) {
               stroke="url(#arcGrad)"
               strokeWidth="2"
               strokeDasharray={`${dayProgress * 260} 260`}
+              style={{ transition: 'stroke-dasharray 1s ease' }}
+            />
+            {/* Light travelling along the day arc */}
+            <path
+              d="M10,70 Q100,-10 190,70"
+              fill="none"
+              stroke="rgba(255,236,190,0.75)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeDasharray="26 234"
+              className="arc-comet"
+            />
+
+            {/* Sun halo breathes as it tracks the arc */}
+            <circle
+              cx={sunX}
+              cy={sunY}
+              r="18"
+              fill="url(#sunGlow)"
+              className="animate-glow-pulse"
+              style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
             />
             <circle
-              cx={10 + dayProgress * 180}
-              cy={70 - Math.sin(dayProgress * Math.PI) * 80}
+              cx={sunX}
+              cy={sunY}
               r="6"
               fill="#ffd47a"
               className="drop-shadow-[0_0_10px_rgba(255,212,122,0.8)]"
+              style={{ transition: 'cx 1s ease, cy 1s ease' }}
             />
+
+            {/* Moon opposite the sun's position */}
+            <g
+              className="animate-float-slow"
+              transform={`translate(${190 - (sunX - 10)},${sunY > 40 ? 24 : 40})`}
+              opacity="0.85"
+            >
+              <circle r="5" fill="rgba(226,236,255,0.85)" className="drop-shadow-[0_0_8px_rgba(200,220,255,0.7)]" />
+              <circle cx="2.4" cy="-1.4" r="4.6" fill="#0a1230" opacity="0.85" />
+            </g>
           </svg>
         </div>
         <div className="mt-2 grid grid-cols-2 gap-3">
@@ -73,8 +115,8 @@ export function SunMoonPanel({ astronomy }: Props) {
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-white/70">{icon}</span>
+    <div className="group flex items-center gap-2 transition-transform duration-300 hover:-translate-y-0.5">
+      <span className="text-white/70 transition-transform duration-500 group-hover:scale-110">{icon}</span>
       <div className="flex flex-col">
         <span className="text-[10px] uppercase tracking-wider text-white/45">{label}</span>
         <span className="text-sm font-semibold text-white">{value}</span>
@@ -90,16 +132,29 @@ function MoonPhase({ phase, illumination }: { phase: number; illumination: numbe
   const isWaxing = phase < 0.5;
   return (
     <div className="relative h-16 w-16 shrink-0">
-      <div className="absolute inset-0 rounded-full bg-slate-200" />
+      {/* Halo breathes behind the disc */}
+      <div className="absolute -inset-2 animate-glow-pulse rounded-full bg-slate-200/20 blur-lg" />
+
+      <div className="absolute inset-0 overflow-hidden rounded-full bg-slate-200">
+        {/* Surface highlight drifts slowly, as if the moon were turning */}
+        <div
+          className="absolute -inset-4 animate-ring-spin opacity-40"
+          style={{
+            background:
+              'radial-gradient(circle at 32% 34%, rgba(255,255,255,0.55), transparent 42%), radial-gradient(circle at 70% 66%, rgba(160,180,215,0.5), transparent 46%)',
+          }}
+        />
+      </div>
+
       <div
-        className="absolute inset-0 rounded-full"
+        className="absolute inset-0 rounded-full transition-[clip-path] duration-700 ease-out"
         style={{
           background: '#0a1230',
           clipPath: isWaxing ? `inset(0 0 0 50%)` : `inset(0 50% 0 0)`,
         }}
       />
       <div
-        className="absolute top-0 h-full rounded-full"
+        className="absolute top-0 h-full rounded-full transition-transform duration-700 ease-out"
         style={{
           width: '100%',
           background: '#0a1230',
@@ -115,4 +170,10 @@ function MoonPhase({ phase, illumination }: { phase: number; illumination: numbe
 
 function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+/** Point on a quadratic bezier at parameter t (0..1). */
+function bezierAt(p0: number, p1: number, p2: number, t: number): number {
+  const u = 1 - t;
+  return u * u * p0 + 2 * u * t * p1 + t * t * p2;
 }
