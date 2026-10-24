@@ -1,0 +1,53 @@
+# Base44 sandbox runbook for AetherWeather.
+#
+# AetherWeather is a pure client-side Vite + React (TypeScript) SPA: no backend,
+# no database. Its default weather provider (Open-Meteo) is keyless and is called
+# directly from the browser, so no external credentials are required to run it.
+#
+# The app is served from the cloned source by the Vite dev server (bind mount +
+# node_modules volume), so edits in the sandbox show up without a rebuild.
+#
+# Bring up:  docker compose -f docker-compose.base44.yml up -d --build
+# Web entry: http://localhost:3000
+
+services:
+  web:
+    image: node:22
+    working_dir: /app
+    # Dependencies live in a Docker volume, so install them at startup from the
+    # current lockfile, then run the live-reload dev server bound to 0.0.0.0.
+    command:
+      - sh
+      - -ec
+      - |
+        npm ci --no-audit --no-fund
+        exec npm run dev -- --host 0.0.0.0 --port 5173 --strictPort
+    ports:
+      - "3000:5173"
+    environment:
+      # Sandbox preview pass-through (values are supplied by the platform).
+      - BASE44_PREVIEW_MODE
+      - BASE44_SANDBOX_HOST_DOMAIN
+      - BASE44_PUBLIC_HOST_SUFFIX
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+    volumes:
+      - .:/app
+      - web_node_modules:/app/node_modules
+    healthcheck:
+      # Node's global fetch is always available in this image; no extra tools needed.
+      test:
+        - CMD-SHELL
+        - >-
+          node -e "fetch('http://127.0.0.1:5173/').then(async r => { const t = await r.text(); process.exit(r.ok && t.includes('div id=\"root\"') ? 0 : 1); }).catch(() => process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 180s
+    restart: on-failure
+    labels:
+      base44.project: AetherWeather
+      base44.kind: web
+      base44.port: "3000"
+
+volumes:
+  web_node_modules:
