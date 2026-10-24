@@ -9,7 +9,12 @@ interface Props {
 export function Maps({ data, onSelectLocation }: Props) {
   return (
     <div className="flex flex-col gap-8">
-      <WeatherMap location={data.location} onSelectLocation={onSelectLocation} />
+      <WeatherMap
+        location={data.location}
+        onSelectLocation={onSelectLocation}
+        title="Weather Map"
+        subtitle="Pick any spot to name it and read its weather"
+      />
     </div>
   );
 }
